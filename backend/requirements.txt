@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+openpyxl
+xlsxwriter
+requests
+beautifulsoup4
+pydantic
