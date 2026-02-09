@@ -3,7 +3,8 @@ from fastapi.responses import Response
 from typing import List
 from app.services.restock import process_restock_logic
 import json
-from app.schemas import RestockSettings
+from app.schemas import RestockSettings, ShipmentSettings
+from app.services.shipment import process_shipment_logic
 
 app = FastAPI()
 
@@ -47,5 +48,38 @@ async def run_restock(
 
     except Exception as e:
         # In production, log the error properly
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/shipment")
+async def run_shipment(
+    invoice_file: UploadFile = File(...),
+    restock_files: List[UploadFile] = File(...),
+    order_files: List[UploadFile] = File(...),
+    dc_code: str = Form(...),
+    settings_str: str = Form(...)
+):
+    try:
+        settings_dict = json.loads(settings_str)
+        settings = ShipmentSettings(**settings_dict)
+        
+        invoice_content = await invoice_file.read()
+        restock_contents = [await f.read() for f in restock_files]
+        order_contents = [await f.read() for f in order_files]
+
+        result_excel = process_shipment_logic(
+            invoice_content, 
+            order_contents, 
+            restock_contents, 
+            dc_code, 
+            settings
+        )
+
+        return Response(
+            content=result_excel,
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={"Content-Disposition": "attachment; filename=Shipment_Result.xlsx"}
+        )
+    except Exception as e:
         print(f"Error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
