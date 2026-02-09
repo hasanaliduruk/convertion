@@ -7,3 +7,4 @@ xlsxwriter
 requests
 beautifulsoup4
 pydantic
+python-calamine

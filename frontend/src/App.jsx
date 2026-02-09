@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import RestockPage from './components/RestockPage';
+import ShipmentPage from './components/ShipmentPage';
 
 // 1. The Dashboard (Menu) Component
 function Dashboard() {
